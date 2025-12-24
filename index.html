@@ -18,11 +18,9 @@
         .section-panel { display: none; animation: fadeIn 0.3s ease-in-out; }
         .section-panel.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="text-gray-800 h-screen flex overflow-hidden">
@@ -50,6 +48,15 @@
             <div onclick="switchTab('about')" id="tab-about" class="nav-item px-6 py-3 flex items-center gap-3 active">
                 <i class="fas fa-info-circle w-5 text-center"></i> About Us
             </div>
+            <div onclick="switchTab('general')" id="tab-general" class="nav-item px-6 py-3 flex items-center gap-3">
+                <i class="fas fa-sliders-h w-5 text-center"></i> Titles & Links
+            </div>
+            <div onclick="switchTab('services')" id="tab-services" class="nav-item px-6 py-3 flex items-center gap-3">
+                <i class="fas fa-concierge-bell w-5 text-center"></i> Services List
+            </div>
+            <div onclick="switchTab('keyServices')" id="tab-keyServices" class="nav-item px-6 py-3 flex items-center gap-3">
+                <i class="fas fa-list-check w-5 text-center"></i> Planning Services
+            </div>
             <div onclick="switchTab('themes')" id="tab-themes" class="nav-item px-6 py-3 flex items-center gap-3">
                 <i class="fas fa-paint-brush w-5 text-center"></i> Popular Themes
             </div>
@@ -58,9 +65,6 @@
             </div>
             <div onclick="switchTab('testimonials')" id="tab-testimonials" class="nav-item px-6 py-3 flex items-center gap-3">
                 <i class="fas fa-comment-alt w-5 text-center"></i> Testimonials
-            </div>
-            <div onclick="switchTab('seo')" id="tab-seo" class="nav-item px-6 py-3 flex items-center gap-3 text-gray-400 hover:text-white">
-                <i class="fas fa-search w-5 text-center"></i> SEO & Contact
             </div>
             <div onclick="switchTab('gallery')" id="tab-gallery" class="nav-item px-6 py-3 flex items-center gap-3 text-gray-400 hover:text-white">
                 <i class="fas fa-images w-5 text-center"></i> Gallery
@@ -87,72 +91,116 @@
         <div id="panel-about" class="section-panel active">
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 class="text-xl font-bold mb-4 text-blue-700 border-b pb-2">About Us Content</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 gap-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-2">Description Text</label>
-                        <textarea id="about-text" rows="8" class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-gray-700 leading-relaxed"></textarea>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Main Heading</label>
+                        <input type="text" id="about-title" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold text-lg">
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-2">About Image URL</label>
-                        <input type="text" id="about-img" class="w-full p-3 border rounded-lg mb-4" placeholder="https://..." oninput="updatePreview('about-preview', this.value)">
-                        <div class="h-48 bg-gray-100 rounded-lg overflow-hidden border flex items-center justify-center">
-                            <img id="about-preview" src="" class="w-full h-full object-cover hidden">
-                            <span class="text-gray-400 text-sm">Image Preview</span>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Description Text</label>
+                            <textarea id="about-text" rows="8" class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-gray-700 leading-relaxed"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">About Image Link (URL)</label>
+                            <input type="text" id="about-img" class="w-full p-3 border rounded-lg mb-4" placeholder="https://example.com/image.jpg" oninput="updatePreview('about-preview', this.value)">
+                            <div class="h-48 bg-gray-100 rounded-lg overflow-hidden border flex items-center justify-center">
+                                <img id="about-preview" src="" class="w-full h-full object-cover hidden">
+                                <span class="text-gray-400 text-sm">Image Preview</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="panel-themes" class="section-panel">
+        <div id="panel-general" class="section-panel">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Titles & Social Links</h2>
+            
+            <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border-l-4 border-yellow-500">
+                <h3 class="text-lg font-bold mb-4">Section Headings</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Services Tag (e.g. "Our Services")</label>
+                        <input type="text" id="services-title" class="w-full p-3 border rounded-lg font-bold text-gray-800 focus:ring-2 focus:ring-yellow-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Services Subtitle (e.g. "Our Grateful Events...")</label>
+                        <input type="text" id="services-subtitle" class="w-full p-3 border rounded-lg font-bold text-gray-800 focus:ring-2 focus:ring-yellow-500 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                <h3 class="text-lg font-bold mb-4">Social Media Links (Footer)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-1"><i class="fab fa-instagram text-pink-500"></i> Instagram Link</label>
+                        <input type="text" id="social-instagram" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://instagram.com/...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-1"><i class="fab fa-facebook text-blue-700"></i> Facebook Link</label>
+                        <input type="text" id="social-facebook" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://facebook.com/...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-1"><i class="fab fa-linkedin text-blue-900"></i> LinkedIn Link</label>
+                        <input type="text" id="social-linkedin" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://linkedin.com/...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-services" class="section-panel">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Popular Themes</h2>
-                    <p class="text-gray-500 text-sm">These appear as buttons/tags on your site.</p>
+                    <h2 class="text-2xl font-bold text-gray-800">Main Services Cards</h2>
+                    <p class="text-gray-500 text-sm">Manage the cards with images.</p>
                 </div>
+                <button onclick="addItem('services')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Service</button>
+            </div>
+            <div id="list-services" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+
+        <div id="panel-keyServices" class="section-panel">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Planning & Management</h2>
+                    <p class="text-gray-500 text-sm">Bullet points list.</p>
+                </div>
+                <button onclick="addSimpleItem('keyServices')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Item</button>
+            </div>
+            <div id="list-keyServices" class="grid grid-cols-1 gap-3"></div>
+        </div>
+
+        <div id="panel-themes" class="section-panel">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Popular Themes</h2>
                 <button onclick="addSimpleItem('serviceCategories')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Theme</button>
             </div>
-            <div id="list-serviceCategories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                </div>
+            <div id="list-serviceCategories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
 
         <div id="panel-facilities" class="section-panel">
             <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Special Services</h2>
-                    <p class="text-gray-500 text-sm">List your unique offerings (DJ, Valet, etc).</p>
-                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Special Services</h2>
                 <button onclick="addSimpleItem('facilities')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Service</button>
             </div>
-            <div id="list-facilities" class="grid grid-cols-1 gap-3">
-                </div>
+            <div id="list-facilities" class="grid grid-cols-1 gap-3"></div>
         </div>
 
         <div id="panel-testimonials" class="section-panel">
              <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Client Testimonials</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Testimonials</h2>
                 <button onclick="addTestimonial()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Review</button>
             </div>
-            <div id="list-testimonials" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                </div>
-        </div>
-
-        <div id="panel-seo" class="section-panel">
-             <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
-                <h2 class="text-xl font-bold mb-4">Contact Information</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="contact-phone" class="p-3 border rounded" placeholder="Phone">
-                    <input type="text" id="contact-email" class="p-3 border rounded" placeholder="Email">
-                    <input type="text" id="contact-address" class="p-3 border rounded md:col-span-2" placeholder="Address">
-                </div>
-             </div>
+            <div id="list-testimonials" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </div>
 
         <div id="panel-gallery" class="section-panel">
              <div class="bg-white p-6 rounded-xl shadow-sm">
                 <div class="flex justify-between mb-4">
                     <h2 class="text-xl font-bold">Image Gallery</h2>
-                    <button onclick="addSimpleItem('galleryImages')" class="text-blue-600 font-bold">+ Add Image URL</button>
+                    <button onclick="addSimpleItem('galleryImages')" class="text-blue-600 font-bold">+ Add Image Link</button>
                 </div>
                 <div id="list-galleryImages" class="space-y-3"></div>
              </div>
@@ -160,12 +208,8 @@
 
         <div id="panel-settings" class="section-panel">
             <div class="bg-red-50 border border-red-200 rounded-xl p-8 text-center max-w-2xl mx-auto mt-10">
-                <div class="text-red-500 text-5xl mb-4"><i class="fas fa-exclamation-triangle"></i></div>
                 <h2 class="text-2xl font-bold text-red-700 mb-2">Danger Zone</h2>
-                <p class="text-red-600 mb-6">Restoring data will wipe all your custom changes and return the website to its original factory state.</p>
-                <button onclick="restoreDefaultData()" class="bg-red-600 text-white font-bold py-3 px-8 rounded-lg shadow hover:bg-red-700 transition">
-                    Restore Original Data
-                </button>
+                <button onclick="restoreDefaultData()" class="bg-red-600 text-white font-bold py-3 px-8 rounded-lg shadow hover:bg-red-700 transition">Restore Original Data</button>
             </div>
         </div>
 
@@ -180,50 +224,45 @@
         // ==========================================
         // 1. FIREBASE CONFIGURATION
         // ==========================================
-       const firebaseConfig = {
-  apiKey: "AIzaSyDP3sJrsTtJK0akGINs8FM_uD9kgCDXVVI",
-  authDomain: "choudhary-display.firebaseapp.com",
-  databaseURL: "https://choudhary-display-default-rtdb.firebaseio.com",
-  projectId: "choudhary-display",
-  storageBucket: "choudhary-display.firebasestorage.app",
-  messagingSenderId: "201311724678",
-  appId: "1:201311724678:web:d4ce389f4ffae76fb19d07",
-  measurementId: "G-VBW112930K"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDP3sJrsTtJK0akGINs8FM_uD9kgCDXVVI",
+            authDomain: "choudhary-display.firebaseapp.com",
+            databaseURL: "https://choudhary-display-default-rtdb.firebaseio.com",
+            projectId: "choudhary-display",
+            storageBucket: "choudhary-display.firebasestorage.app",
+            messagingSenderId: "201311724678",
+            appId: "1:201311724678:web:d4ce389f4ffae76fb19d07",
+            measurementId: "G-VBW112930K"
+        };
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
 
-        // Global Data Store
         let currentData = {};
 
-        // ORIGINAL DEFAULT DATA (For Restore Feature)
+        // Default Data
         const defaultData = {
-          "seo": { "title": "Choudhary Display - Party Specialist", "description": "30+ Years Experience", "keywords": "wedding, events" },
+          "seo": { "title": "Choudhary Display", "description": "Event Planner", "keywords": "wedding" },
           "heroImageUrl": "images/hero1.jpeg",
           "businessLogoUrl": "images/logo.jpeg",
-          "aboutText": "For over 30 years, Choudhary Display has been the leading event specialist in our region. We believe in creating magical, unforgettable moments. Our mission is to combine your vision with our expertise to deliver flawless events. From intimate gatherings to grand celebrations, our dedicated team handles every detail with passion and precision.",
+          "aboutTitle": "Trusted Over 30+ Years of Experience", 
+          "servicesTitle": "Our Services",
+          "servicesSubtitle": "Our Grateful Events & Services",
+          "aboutText": "For over 30 years...",
           "aboutImageUrl": "images/aboutimg2.jpeg",
           "services": [
             { "title": "Dream Weddings", "imageUrl": "images/weddingimg1.jpeg" },
             { "title": "Other Events", "imageUrl": "images/otherimg1.jpeg" }
           ],
           "serviceCategories": ["Haldi Themes", "Reception Themes", "Floral Decor", "Modern & Minimal", "Royal & Traditional"],
-          "keyServices": ["Full-Service Planning", "Venue Selection & Management", "Catering & Menu Design", "Vendor Coordination", "Guest Management"],
-          "facilities": ["In-house DJ & Sound Systems", "Custom Stage & Lighting Design", "Interactive Photobooths", "Valet & Transport Services"],
-          "galleryImages": ["images/img1.jpeg", "images/img2.jpeg", "images/img3.jpeg", "images/img4.jpeg", "images/img5.jpeg"],
-          "testimonials": [
-            { "name": "Priya & Rohan Sharma", "event": "Our Wedding", "quote": "They made our day absolutely magical! Every single detail was perfect." },
-            { "name": "Mr. R. Gupta, CEO", "event": "Annual Corporate Gala", "quote": "Flawless execution for our annual gala." }
-          ],
-          "contactInfo": { "address": "Pancham Villa Sayaji Park Ajwa Road Vadodra Gujrat", "phone": "+91 9328544199", "email": "vikaschoudhary05052007@gmail.com" },
-          "socialLinks": { "instagram": "https.www.instagram.com/chaudharydisplay", "facebook": "https.www.facebook.com", "linkedin": "#" }
+          "keyServices": ["Full-Service Planning", "Venue Selection", "Catering", "Vendor Coordination", "Guest Management"],
+          "facilities": ["DJ & Sound", "Stage & Lighting", "Photobooths", "Valet"],
+          "galleryImages": ["images/img1.jpeg", "images/img2.jpeg", "images/img3.jpeg", "images/img4.jpeg"],
+          "testimonials": [{ "name": "Priya", "event": "Wedding", "quote": "Magical!" }],
+          "contactInfo": { "address": "Vadodra", "phone": "+91 9328544199", "email": "vikas@gmail.com" },
+          "socialLinks": { "instagram": "https://instagram.com", "facebook": "https://facebook.com", "linkedin": "#" }
         };
-
-        // ==========================================
-        // 2. LOGIC & FUNCTIONS
-        // ==========================================
 
         // --- Auth ---
         function login() {
@@ -242,7 +281,7 @@
             }
         });
 
-        // --- Data Loading ---
+        // --- Data ---
         function loadData() {
             db.ref('websiteData').once('value', snapshot => {
                 currentData = snapshot.val() || JSON.parse(JSON.stringify(defaultData));
@@ -250,142 +289,136 @@
             });
         }
 
-        // --- Render Functions ---
+        // --- Render UI ---
         function renderAll() {
-            // About
+            // Text Inputs
+            document.getElementById('about-title').value = currentData.aboutTitle || '';
             document.getElementById('about-text').value = currentData.aboutText || '';
             document.getElementById('about-img').value = currentData.aboutImageUrl || '';
             updatePreview('about-preview', currentData.aboutImageUrl);
 
-            // Contact
-            if(currentData.contactInfo) {
-                document.getElementById('contact-phone').value = currentData.contactInfo.phone || '';
-                document.getElementById('contact-email').value = currentData.contactInfo.email || '';
-                document.getElementById('contact-address').value = currentData.contactInfo.address || '';
-            }
+            document.getElementById('services-title').value = currentData.servicesTitle || 'Our Services';
+            document.getElementById('services-subtitle').value = currentData.servicesSubtitle || 'Our Grateful Events & Services';
+
+            if(!currentData.socialLinks) currentData.socialLinks = {};
+            document.getElementById('social-instagram').value = currentData.socialLinks.instagram || '';
+            document.getElementById('social-facebook').value = currentData.socialLinks.facebook || '';
+            document.getElementById('social-linkedin').value = currentData.socialLinks.linkedin || '';
 
             // Lists
-            renderList('serviceCategories', 'list-serviceCategories', (item, i) => `
-                <div class="flex items-center bg-white p-3 rounded shadow-sm border">
-                    <input type="text" class="flex-1 bg-transparent outline-none font-medium text-gray-700" value="${item}" onchange="updateListItem('serviceCategories', ${i}, this.value)">
-                    <button onclick="deleteListItem('serviceCategories', ${i})" class="text-red-400 hover:text-red-600 ml-2"><i class="fas fa-trash"></i></button>
-                </div>
-            `);
-
-            renderList('facilities', 'list-facilities', (item, i) => `
-                <div class="flex items-center bg-white p-4 rounded shadow-sm border border-l-4 border-green-500">
-                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                    <input type="text" class="flex-1 bg-transparent outline-none text-gray-700" value="${item}" onchange="updateListItem('facilities', ${i}, this.value)">
-                    <button onclick="deleteListItem('facilities', ${i})" class="text-red-400 hover:text-red-600 ml-2"><i class="fas fa-trash"></i></button>
-                </div>
-            `);
-
-            renderList('testimonials', 'list-testimonials', (t, i) => `
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 relative group">
-                    <button onclick="deleteListItem('testimonials', ${i})" class="absolute top-3 right-3 text-red-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash-alt"></i></button>
-                    <div class="mb-3">
-                        <label class="text-xs font-bold text-gray-400 uppercase">Client Name</label>
-                        <input type="text" class="w-full font-bold text-gray-800 border-b border-dashed focus:border-blue-500 outline-none pb-1" value="${t.name}" onchange="updateDeepItem('testimonials', ${i}, 'name', this.value)">
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-xs font-bold text-gray-400 uppercase">Event Type</label>
-                        <input type="text" class="w-full text-sm text-blue-600 border-b border-dashed focus:border-blue-500 outline-none pb-1" value="${t.event}" onchange="updateDeepItem('testimonials', ${i}, 'event', this.value)">
-                    </div>
+            renderList('services', 'list-services', (item, i) => `
+                <div class="bg-white p-4 rounded shadow border relative">
+                    <button onclick="deleteListItem('services', ${i})" class="absolute top-2 right-2 text-red-500 font-bold">✕</button>
+                    <div class="mb-2"><label class="text-xs font-bold text-gray-500">Service Title</label><input class="w-full border rounded p-1" value="${item.title}" oninput="updateDeepItem('services', ${i}, 'title', this.value)"></div>
                     <div>
-                        <label class="text-xs font-bold text-gray-400 uppercase">Review</label>
-                        <textarea rows="3" class="w-full text-gray-600 text-sm mt-1 p-2 bg-gray-50 rounded border-none resize-none" onchange="updateDeepItem('testimonials', ${i}, 'quote', this.value)">${t.quote}</textarea>
+                        <label class="text-xs font-bold text-gray-500">Image Link (URL)</label>
+                        <input class="w-full border rounded p-1 mb-2" value="${item.imageUrl}" oninput="updateDeepItemAndPreview('services', ${i}, 'imageUrl', this.value, 'svc-preview-${i}')">
+                        <img id="svc-preview-${i}" src="${item.imageUrl}" class="h-24 w-full object-cover rounded bg-gray-100">
                     </div>
                 </div>
             `);
 
-            // Gallery (Simple URL list)
             renderList('galleryImages', 'list-galleryImages', (url, i) => `
-                <div class="flex gap-2">
-                    <input class="flex-1 border p-2 rounded" value="${url}" onchange="updateListItem('galleryImages', ${i}, this.value)">
-                    <button onclick="deleteListItem('galleryImages', ${i})" class="text-red-500 px-2"><i class="fas fa-times"></i></button>
+                <div class="flex gap-2 items-center">
+                    <img id="gal-preview-${i}" src="${url}" class="h-12 w-12 object-cover rounded border">
+                    <input class="flex-1 border p-2 rounded" value="${url}" oninput="updateSimpleItemAndPreview('galleryImages', ${i}, this.value, 'gal-preview-${i}')">
+                    <button onclick="deleteListItem('galleryImages', ${i})" class="text-red-500 px-2"><i class="fas fa-trash"></i></button>
                 </div>
             `);
-        }
 
-        // --- Helper Helpers ---
-        function renderList(key, containerId, templateFn) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            (currentData[key] || []).forEach((item, index) => {
-                container.innerHTML += templateFn(item, index);
+            // Other lists (Simple)
+            ['serviceCategories', 'facilities', 'keyServices'].forEach(key => {
+                const div = document.getElementById('list-'+key);
+                div.innerHTML = '';
+                (currentData[key]||[]).forEach((item, i) => {
+                    div.innerHTML += `<div class="flex items-center bg-white p-3 rounded shadow-sm border"><input class="flex-1 bg-transparent outline-none" value="${item}" onchange="updateListItem('${key}', ${i}, this.value)"><button onclick="deleteListItem('${key}', ${i})" class="text-red-500 ml-2">✕</button></div>`;
+                });
+            });
+
+            // Testimonials
+            const tDiv = document.getElementById('list-testimonials');
+            tDiv.innerHTML = '';
+            (currentData.testimonials||[]).forEach((t, i) => {
+                tDiv.innerHTML += `<div class="bg-white p-4 rounded shadow relative"><button onclick="deleteListItem('testimonials', ${i})" class="absolute top-2 right-2 text-red-500">✕</button><input class="w-full border p-1 mb-2" value="${t.name}" onchange="updateDeepItem('testimonials', ${i}, 'name', this.value)"><input class="w-full border p-1 mb-2" value="${t.event}" onchange="updateDeepItem('testimonials', ${i}, 'event', this.value)"><textarea class="w-full border p-1" onchange="updateDeepItem('testimonials', ${i}, 'quote', this.value)">${t.quote}</textarea></div>`;
             });
         }
 
+        // --- Helpers ---
+        function renderList(key, id, tpl) {
+            const el = document.getElementById(id);
+            el.innerHTML = '';
+            (currentData[key]||[]).forEach((item, i) => el.innerHTML += tpl(item, i));
+        }
         function updatePreview(id, src) {
             const el = document.getElementById(id);
-            if(src) { el.src = src; el.classList.remove('hidden'); }
-            else { el.classList.add('hidden'); }
+            if(el) { el.src = src; el.classList.remove('hidden'); }
         }
-
-        // --- CRUD Operations ---
-        function updateListItem(key, index, val) { currentData[key][index] = val; }
-        function updateDeepItem(key, index, field, val) { currentData[key][index][field] = val; }
+        function updateDeepItem(k, i, f, v) { currentData[k][i][f] = v; }
+        function updateListItem(k, i, v) { currentData[k][i] = v; }
         
-        function deleteListItem(key, index) {
-            if(confirm('Delete this item?')) {
-                currentData[key].splice(index, 1);
-                renderAll();
-            }
+        // Special preview updaters for list items
+        function updateDeepItemAndPreview(k, i, f, v, imgId) {
+            currentData[k][i][f] = v;
+            updatePreview(imgId, v);
+        }
+        function updateSimpleItemAndPreview(k, i, v, imgId) {
+            currentData[k][i] = v;
+            updatePreview(imgId, v);
         }
 
-        function addSimpleItem(key) {
-            if(!currentData[key]) currentData[key] = [];
-            currentData[key].push(key === 'galleryImages' ? 'https://' : 'New Item');
+        function deleteListItem(k, i) {
+            if(confirm('Delete?')) { currentData[k].splice(i, 1); renderAll(); }
+        }
+        function addItem(k) {
+            if(!currentData[k]) currentData[k]=[];
+            if(k==='services') currentData[k].push({title:'New', imageUrl:'https://via.placeholder.com/300'});
             renderAll();
         }
-
+        function addSimpleItem(k) {
+            if(!currentData[k]) currentData[k]=[];
+            currentData[k].push(k==='galleryImages'?'https://via.placeholder.com/150':'New Item');
+            renderAll();
+        }
         function addTestimonial() {
-            if(!currentData.testimonials) currentData.testimonials = [];
-            currentData.testimonials.push({ name: 'Client Name', event: 'Event Name', quote: 'Amazing service!' });
+            if(!currentData.testimonials) currentData.testimonials=[];
+            currentData.testimonials.push({name:'Name',event:'Event',quote:'Quote'});
             renderAll();
         }
 
-        // --- Saving & Restore ---
         function saveChanges() {
-            // Harvest singular fields
+            currentData.aboutTitle = document.getElementById('about-title').value;
             currentData.aboutText = document.getElementById('about-text').value;
             currentData.aboutImageUrl = document.getElementById('about-img').value;
+            currentData.servicesTitle = document.getElementById('services-title').value;
+            currentData.servicesSubtitle = document.getElementById('services-subtitle').value;
             
-            if(!currentData.contactInfo) currentData.contactInfo = {};
-            currentData.contactInfo.phone = document.getElementById('contact-phone').value;
-            currentData.contactInfo.email = document.getElementById('contact-email').value;
-            currentData.contactInfo.address = document.getElementById('contact-address').value;
+            if(!currentData.socialLinks) currentData.socialLinks={};
+            currentData.socialLinks.instagram = document.getElementById('social-instagram').value;
+            currentData.socialLinks.facebook = document.getElementById('social-facebook').value;
+            currentData.socialLinks.linkedin = document.getElementById('social-linkedin').value;
 
-            // Push
             const btn = document.getElementById('save-btn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            
+            btn.innerHTML = 'Saving...';
             db.ref('websiteData').set(currentData).then(() => {
-                btn.innerHTML = '<i class="fas fa-save"></i> Publish Changes';
-                const toast = document.getElementById('toast');
-                toast.classList.remove('translate-y-24');
-                setTimeout(() => toast.classList.add('translate-y-24'), 3000);
+                btn.innerHTML = 'Publish Changes';
+                document.getElementById('toast').classList.remove('translate-y-24');
+                setTimeout(()=>document.getElementById('toast').classList.add('translate-y-24'), 3000);
             });
         }
 
         function restoreDefaultData() {
-            if(confirm("WARNING: This will erase all your custom text, photos, and lists and reset them to the original template. Are you sure?")) {
+            if(confirm("Reset all data?")) {
                 currentData = JSON.parse(JSON.stringify(defaultData));
                 renderAll();
                 saveChanges();
-                alert("Data restored to defaults.");
             }
         }
 
-        // --- Navigation ---
-        function switchTab(tabId) {
+        function switchTab(id) {
             document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById('panel-' + tabId).classList.add('active');
-            document.getElementById('tab-' + tabId).classList.add('active');
-            
-            // Mobile: close sidebar logic could go here if needed
+            document.getElementById('panel-'+id).classList.add('active');
+            document.getElementById('tab-'+id).classList.add('active');
         }
     </script>
 </body>
