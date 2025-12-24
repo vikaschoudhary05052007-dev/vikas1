@@ -5,225 +5,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Choudhary Display</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     
     <style>
-        body { background-color: #f3f4f6; }
+        body { background-color: #f8fafc; }
         .nav-item { cursor: pointer; transition: all 0.2s; }
-        .nav-item:hover { background-color: #374151; }
+        .nav-item:hover { background-color: #334155; }
         .nav-item.active { background-color: #2563eb; border-right: 4px solid #60a5fa; }
-        .section-panel { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .section-panel { display: none; animation: slideIn 0.3s ease-out; }
         .section-panel.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Upload Zone Styles */
+        .upload-zone { transition: all 0.3s ease; }
+        .upload-zone:hover { border-color: #3b82f6; background-color: #eff6ff; }
+        .upload-zone.uploading { pointer-events: none; opacity: 0.7; background-color: #f1f5f9; }
+        
+        /* Spinner */
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="text-gray-800 h-screen flex overflow-hidden">
+<body class="text-gray-800 h-screen flex overflow-hidden font-sans">
 
-    <div id="login-overlay" class="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-96 text-center">
-            <div class="mb-4 text-blue-600"><i class="fas fa-user-shield text-5xl"></i></div>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">Admin Access</h2>
+    <div id="login-overlay" class="fixed inset-0 z-50 bg-slate-900 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 text-center transform transition-all hover:scale-105">
+            <div class="mb-6 text-blue-600"><i class="fas fa-shield-alt text-6xl"></i></div>
+            <h2 class="text-3xl font-bold mb-2 text-gray-800">Admin Login</h2>
+            <p class="text-gray-500 mb-6 text-sm">Choudhary Display CMS</p>
             <form onsubmit="event.preventDefault(); login();" class="space-y-4">
-                <input type="email" id="email" placeholder="admin@example.com" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
-                <input type="password" id="password" placeholder="Password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition">
-                <button type="submit" class="w-full bg-blue-600 text-white font-bold p-3 rounded-lg hover:bg-blue-700 transition shadow-lg">Login / Register</button>
+                <input type="email" id="email" placeholder="admin@example.com" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+                <input type="password" id="password" placeholder="Password" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold p-4 rounded-xl hover:bg-blue-700 transition shadow-lg hover:shadow-blue-500/30">Login</button>
             </form>
-            <p id="login-msg" class="text-red-500 text-sm mt-4"></p>
+            <p id="login-msg" class="text-red-500 text-sm mt-4 font-medium"></p>
         </div>
     </div>
 
-    <aside class="w-64 bg-gray-900 text-white flex flex-col shadow-xl z-10">
-        <div class="p-6 border-b border-gray-800 flex items-center gap-3">
-            <i class="fas fa-crown text-yellow-500 text-xl"></i>
-            <span class="font-bold text-lg tracking-wide">Choudhary Admin</span>
+    <aside class="w-72 bg-slate-900 text-white flex flex-col shadow-2xl z-10">
+        <div class="p-8 border-b border-slate-800 flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl">CD</div>
+            <span class="font-bold text-xl tracking-wide">Admin Panel</span>
         </div>
         
-        <nav class="flex-1 overflow-y-auto py-4 space-y-1">
-            <div onclick="switchTab('about')" id="tab-about" class="nav-item px-6 py-3 flex items-center gap-3 active">
-                <i class="fas fa-info-circle w-5 text-center"></i> About Us
+        <nav class="flex-1 overflow-y-auto py-6 space-y-2 px-4">
+            <div onclick="switchTab('about')" id="tab-about" class="nav-item px-4 py-3 rounded-lg flex items-center gap-3 active">
+                <i class="fas fa-home w-6 text-center"></i> Home & About
             </div>
-            <div onclick="switchTab('general')" id="tab-general" class="nav-item px-6 py-3 flex items-center gap-3">
-                <i class="fas fa-sliders-h w-5 text-center"></i> Titles & Links
+            <div onclick="switchTab('services')" id="tab-services" class="nav-item px-4 py-3 rounded-lg flex items-center gap-3">
+                <i class="fas fa-concierge-bell w-6 text-center"></i> Services
             </div>
-            <div onclick="switchTab('services')" id="tab-services" class="nav-item px-6 py-3 flex items-center gap-3">
-                <i class="fas fa-concierge-bell w-5 text-center"></i> Services List
+            <div onclick="switchTab('gallery')" id="tab-gallery" class="nav-item px-4 py-3 rounded-lg flex items-center gap-3">
+                <i class="fas fa-images w-6 text-center"></i> Gallery
             </div>
-            <div onclick="switchTab('keyServices')" id="tab-keyServices" class="nav-item px-6 py-3 flex items-center gap-3">
-                <i class="fas fa-list-check w-5 text-center"></i> Planning Services
+            <div onclick="switchTab('details')" id="tab-details" class="nav-item px-4 py-3 rounded-lg flex items-center gap-3">
+                <i class="fas fa-list w-6 text-center"></i> Lists & Text
             </div>
-            <div onclick="switchTab('themes')" id="tab-themes" class="nav-item px-6 py-3 flex items-center gap-3">
-                <i class="fas fa-paint-brush w-5 text-center"></i> Popular Themes
-            </div>
-            <div onclick="switchTab('facilities')" id="tab-facilities" class="nav-item px-6 py-3 flex items-center gap-3">
-                <i class="fas fa-star w-5 text-center"></i> Special Services
-            </div>
-            <div onclick="switchTab('testimonials')" id="tab-testimonials" class="nav-item px-6 py-3 flex items-center gap-3">
-                <i class="fas fa-comment-alt w-5 text-center"></i> Testimonials
-            </div>
-            <div onclick="switchTab('gallery')" id="tab-gallery" class="nav-item px-6 py-3 flex items-center gap-3 text-gray-400 hover:text-white">
-                <i class="fas fa-images w-5 text-center"></i> Gallery
+            <div onclick="switchTab('contact')" id="tab-contact" class="nav-item px-4 py-3 rounded-lg flex items-center gap-3">
+                <i class="fas fa-address-card w-6 text-center"></i> Contact & SEO
             </div>
         </nav>
 
-        <div class="p-4 border-t border-gray-800 bg-gray-900">
-            <div onclick="switchTab('settings')" id="tab-settings" class="nav-item px-4 py-2 rounded text-sm text-gray-400 hover:text-white mb-2 flex items-center gap-2">
-                <i class="fas fa-cog"></i> Restore / Settings
-            </div>
-            <button onclick="saveChanges()" id="save-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg flex items-center justify-center gap-2 transition transform hover:scale-105">
+        <div class="p-6 border-t border-slate-800 bg-slate-900">
+            <button onclick="saveChanges()" id="save-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-2 transition transform hover:-translate-y-1">
                 <i class="fas fa-save"></i> Publish Changes
+            </button>
+            <button onclick="logout()" class="w-full text-slate-400 hover:text-white text-sm mt-4 flex items-center justify-center gap-2">
+                <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto bg-gray-50 p-8 relative">
+    <main class="flex-1 overflow-y-auto bg-slate-50 p-10 relative">
         
-        <header class="flex justify-between items-center mb-8">
-            <h1 id="page-title" class="text-3xl font-bold text-gray-800">Edit Website Content</h1>
-            <button onclick="logout()" class="text-red-500 hover:text-red-700 font-medium text-sm flex items-center gap-1"><i class="fas fa-sign-out-alt"></i> Logout</button>
-        </header>
-
         <div id="panel-about" class="section-panel active">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-xl font-bold mb-4 text-blue-700 border-b pb-2">About Us Content</h2>
-                <div class="grid grid-cols-1 gap-6">
+            <h1 class="text-3xl font-bold text-slate-800 mb-8">Home & About</h1>
+            
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 mb-8">
+                <h2 class="text-xl font-bold mb-6 text-slate-700 flex items-center gap-2"><i class="fas fa-image text-blue-500"></i> Hero Background Image</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-2">Main Heading</label>
-                        <input type="text" id="about-title" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-bold text-lg">
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-600 mb-2">Description Text</label>
-                            <textarea id="about-text" rows="8" class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 text-gray-700 leading-relaxed"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-600 mb-2">About Image Link (URL)</label>
-                            <input type="text" id="about-img" class="w-full p-3 border rounded-lg mb-4" placeholder="https://example.com/image.jpg" oninput="updatePreview('about-preview', this.value)">
-                            <div class="h-48 bg-gray-100 rounded-lg overflow-hidden border flex items-center justify-center">
-                                <img id="about-preview" src="" class="w-full h-full object-cover hidden">
-                                <span class="text-gray-400 text-sm">Image Preview</span>
+                        <div class="upload-zone border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer group" onclick="triggerUpload('hero-file')">
+                            <input type="file" id="hero-file" class="hidden" onchange="uploadImage('hero-file', 'hero-img', 'hero-preview')">
+                            <div id="hero-file-content">
+                                <i class="fas fa-cloud-upload-alt text-5xl text-slate-300 group-hover:text-blue-500 mb-4 transition-colors"></i>
+                                <p class="text-lg font-bold text-slate-600 group-hover:text-blue-600">Click to Upload Hero Image</p>
+                                <p class="text-sm text-slate-400 mt-2">Supports JPG, PNG</p>
                             </div>
                         </div>
+                        <div class="mt-4 relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><i class="fas fa-link"></i></div>
+                            <input type="text" id="hero-img" class="w-full pl-10 p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm" placeholder="Or paste image URL here..." oninput="updatePreview('hero-preview', this.value)">
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="panel-general" class="section-panel">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">Titles & Social Links</h2>
-            
-            <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border-l-4 border-yellow-500">
-                <h3 class="text-lg font-bold mb-4">Section Headings</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-2">Services Tag (e.g. "Our Services")</label>
-                        <input type="text" id="services-title" class="w-full p-3 border rounded-lg font-bold text-gray-800 focus:ring-2 focus:ring-yellow-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-2">Services Subtitle (e.g. "Our Grateful Events...")</label>
-                        <input type="text" id="services-subtitle" class="w-full p-3 border rounded-lg font-bold text-gray-800 focus:ring-2 focus:ring-yellow-500 outline-none">
+                    <div class="h-64 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center relative group">
+                        <img id="hero-preview" src="" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white font-bold">Current Preview</div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
-                <h3 class="text-lg font-bold mb-4">Social Media Links (Footer)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-1"><i class="fab fa-instagram text-pink-500"></i> Instagram Link</label>
-                        <input type="text" id="social-instagram" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://instagram.com/...">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <h2 class="text-xl font-bold mb-6 text-slate-700 flex items-center gap-2"><i class="fas fa-info-circle text-blue-500"></i> About Content</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 mb-2">Main Heading</label>
+                            <input type="text" id="about-title" class="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 mb-2">Description Text</label>
+                            <textarea id="about-text" rows="6" class="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-slate-600 leading-relaxed"></textarea>
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-1"><i class="fab fa-facebook text-blue-700"></i> Facebook Link</label>
-                        <input type="text" id="social-facebook" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://facebook.com/...">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-1"><i class="fab fa-linkedin text-blue-900"></i> LinkedIn Link</label>
-                        <input type="text" id="social-linkedin" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://linkedin.com/...">
+                        <label class="block text-sm font-bold text-slate-600 mb-2">About Image</label>
+                        <div class="upload-zone border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer group mb-4" onclick="triggerUpload('about-file')">
+                            <input type="file" id="about-file" class="hidden" onchange="uploadImage('about-file', 'about-img', 'about-preview')">
+                            <div id="about-file-content">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-slate-300 group-hover:text-blue-500 mb-2 transition-colors"></i>
+                                <p class="font-bold text-slate-600 group-hover:text-blue-600">Upload Image</p>
+                            </div>
+                        </div>
+                        <input type="text" id="about-img" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm mb-4" placeholder="Image URL..." oninput="updatePreview('about-preview', this.value)">
+                        <div class="h-40 bg-slate-100 rounded-xl overflow-hidden border border-slate-200">
+                            <img id="about-preview" src="" class="w-full h-full object-cover">
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div id="panel-services" class="section-panel">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Main Services Cards</h2>
-                    <p class="text-gray-500 text-sm">Manage the cards with images.</p>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-800">Services</h1>
+                <button onclick="addItem('services')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 transition"><i class="fas fa-plus"></i> Add New Service</button>
+            </div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-sm mb-8 border-l-4 border-yellow-400">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Section Title</label>
+                        <input type="text" id="services-title" class="w-full p-3 border rounded-lg font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Section Subtitle</label>
+                        <input type="text" id="services-subtitle" class="w-full p-3 border rounded-lg">
+                    </div>
                 </div>
-                <button onclick="addItem('services')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Service</button>
             </div>
-            <div id="list-services" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-        </div>
 
-        <div id="panel-keyServices" class="section-panel">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Planning & Management</h2>
-                    <p class="text-gray-500 text-sm">Bullet points list.</p>
+            <div id="list-services" class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 </div>
-                <button onclick="addSimpleItem('keyServices')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Item</button>
-            </div>
-            <div id="list-keyServices" class="grid grid-cols-1 gap-3"></div>
-        </div>
-
-        <div id="panel-themes" class="section-panel">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Popular Themes</h2>
-                <button onclick="addSimpleItem('serviceCategories')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Theme</button>
-            </div>
-            <div id="list-serviceCategories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </div>
-
-        <div id="panel-facilities" class="section-panel">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Special Services</h2>
-                <button onclick="addSimpleItem('facilities')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Service</button>
-            </div>
-            <div id="list-facilities" class="grid grid-cols-1 gap-3"></div>
-        </div>
-
-        <div id="panel-testimonials" class="section-panel">
-             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Testimonials</h2>
-                <button onclick="addTestimonial()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 shadow flex items-center gap-2"><i class="fas fa-plus"></i> Add Review</button>
-            </div>
-            <div id="list-testimonials" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </div>
 
         <div id="panel-gallery" class="section-panel">
-             <div class="bg-white p-6 rounded-xl shadow-sm">
-                <div class="flex justify-between mb-4">
-                    <h2 class="text-xl font-bold">Image Gallery</h2>
-                    <button onclick="addSimpleItem('galleryImages')" class="text-blue-600 font-bold">+ Add Image Link</button>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-800">Gallery</h1>
+                <button onclick="addSimpleItem('galleryImages')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2"><i class="fas fa-plus"></i> Add Empty Slot</button>
+            </div>
+            <div id="list-galleryImages" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 </div>
-                <div id="list-galleryImages" class="space-y-3"></div>
-             </div>
         </div>
 
-        <div id="panel-settings" class="section-panel">
-            <div class="bg-red-50 border border-red-200 rounded-xl p-8 text-center max-w-2xl mx-auto mt-10">
-                <h2 class="text-2xl font-bold text-red-700 mb-2">Danger Zone</h2>
-                <button onclick="restoreDefaultData()" class="bg-red-600 text-white font-bold py-3 px-8 rounded-lg shadow hover:bg-red-700 transition">Restore Original Data</button>
+        <div id="panel-details" class="section-panel">
+            <h1 class="text-3xl font-bold text-slate-800 mb-8">Lists & Details</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold">Planning Services</h2>
+                        <button onclick="addSimpleItem('keyServices')" class="text-blue-600 hover:bg-blue-100 px-3 py-1 rounded transition">+ Add</button>
+                    </div>
+                    <div id="list-keyServices" class="space-y-2"></div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold">Popular Themes</h2>
+                        <button onclick="addSimpleItem('serviceCategories')" class="text-blue-600 hover:bg-blue-100 px-3 py-1 rounded transition">+ Add</button>
+                    </div>
+                    <div id="list-serviceCategories" class="space-y-2"></div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold">Facilities</h2>
+                        <button onclick="addSimpleItem('facilities')" class="text-blue-600 hover:bg-blue-100 px-3 py-1 rounded transition">+ Add</button>
+                    </div>
+                    <div id="list-facilities" class="space-y-2"></div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold">Testimonials</h2>
+                        <button onclick="addTestimonial()" class="text-blue-600 hover:bg-blue-100 px-3 py-1 rounded transition">+ Add</button>
+                    </div>
+                    <div id="list-testimonials" class="space-y-4 max-h-96 overflow-y-auto"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-contact" class="section-panel">
+            <h1 class="text-3xl font-bold text-slate-800 mb-8">Contact & Footer</h1>
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <h3 class="text-lg font-bold mb-6 text-slate-700">Social Media Links</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Instagram</label>
+                        <div class="flex items-center border rounded-lg overflow-hidden bg-slate-50">
+                            <span class="px-3 text-slate-400"><i class="fab fa-instagram"></i></span>
+                            <input type="text" id="social-instagram" class="w-full p-3 bg-transparent outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Facebook</label>
+                        <div class="flex items-center border rounded-lg overflow-hidden bg-slate-50">
+                            <span class="px-3 text-slate-400"><i class="fab fa-facebook"></i></span>
+                            <input type="text" id="social-facebook" class="w-full p-3 bg-transparent outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">LinkedIn</label>
+                        <div class="flex items-center border rounded-lg overflow-hidden bg-slate-50">
+                            <span class="px-3 text-slate-400"><i class="fab fa-linkedin"></i></span>
+                            <input type="text" id="social-linkedin" class="w-full p-3 bg-transparent outline-none">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
     </main>
 
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-4 rounded-lg shadow-xl transform translate-y-24 transition duration-300 flex items-center gap-3">
-        <i class="fas fa-check-circle text-green-400"></i>
-        <span>Changes Saved Successfully!</span>
+    <div id="toast" class="fixed bottom-8 right-8 bg-slate-800 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-40 transition-all duration-500 flex items-center gap-4 z-50">
+        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><i class="fas fa-check"></i></div>
+        <div>
+            <h4 class="font-bold">Saved!</h4>
+            <p class="text-xs text-slate-300">Changes published to website.</p>
+        </div>
     </div>
 
     <script>
         // ==========================================
-        // 1. FIREBASE CONFIGURATION
+        // CONFIGURATION
         // ==========================================
+        
+        // 1. PASTE IMGBB API KEY HERE
+        const IMGBB_API_KEY = "6f04973e8d5cdc28eb66d4d2c0291261"; 
+
+        // 2. PASTE FIREBASE CONFIG HERE
         const firebaseConfig = {
             apiKey: "AIzaSyDP3sJrsTtJK0akGINs8FM_uD9kgCDXVVI",
             authDomain: "choudhary-display.firebaseapp.com",
@@ -240,37 +274,15 @@
         const auth = firebase.auth();
 
         let currentData = {};
+        const defaultData = {"seo":{"title":"Choudhary Display"},"heroImageUrl":"","businessLogoUrl":"","aboutTitle":"Trusted Experience","servicesTitle":"Our Services","servicesSubtitle":"Grateful Events","aboutText":"...","aboutImageUrl":"","services":[],"serviceCategories":[],"keyServices":[],"facilities":[],"galleryImages":[],"testimonials":[],"contactInfo":{},"socialLinks":{}};
 
-        // Default Data
-        const defaultData = {
-          "seo": { "title": "Choudhary Display", "description": "Event Planner", "keywords": "wedding" },
-          "heroImageUrl": "images/hero1.jpeg",
-          "businessLogoUrl": "images/logo.jpeg",
-          "aboutTitle": "Trusted Over 30+ Years of Experience", 
-          "servicesTitle": "Our Services",
-          "servicesSubtitle": "Our Grateful Events & Services",
-          "aboutText": "For over 30 years...",
-          "aboutImageUrl": "images/aboutimg2.jpeg",
-          "services": [
-            { "title": "Dream Weddings", "imageUrl": "images/weddingimg1.jpeg" },
-            { "title": "Other Events", "imageUrl": "images/otherimg1.jpeg" }
-          ],
-          "serviceCategories": ["Haldi Themes", "Reception Themes", "Floral Decor", "Modern & Minimal", "Royal & Traditional"],
-          "keyServices": ["Full-Service Planning", "Venue Selection", "Catering", "Vendor Coordination", "Guest Management"],
-          "facilities": ["DJ & Sound", "Stage & Lighting", "Photobooths", "Valet"],
-          "galleryImages": ["images/img1.jpeg", "images/img2.jpeg", "images/img3.jpeg", "images/img4.jpeg"],
-          "testimonials": [{ "name": "Priya", "event": "Wedding", "quote": "Magical!" }],
-          "contactInfo": { "address": "Vadodra", "phone": "+91 9328544199", "email": "vikas@gmail.com" },
-          "socialLinks": { "instagram": "https://instagram.com", "facebook": "https://facebook.com", "linkedin": "#" }
-        };
-
-        // --- Auth ---
+        // --- AUTH ---
         function login() {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
             auth.signInWithEmailAndPassword(e, p).catch(err => {
                 if(err.code === 'auth/user-not-found') auth.createUserWithEmailAndPassword(e,p).then(login);
-                else document.getElementById('login-msg').innerText = "Incorrect email or password.";
+                else document.getElementById('login-msg').innerText = "Incorrect login details.";
             });
         }
         function logout() { auth.signOut(); window.location.reload(); }
@@ -281,7 +293,7 @@
             }
         });
 
-        // --- Data ---
+        // --- DATA ---
         function loadData() {
             db.ref('websiteData').once('value', snapshot => {
                 currentData = snapshot.val() || JSON.parse(JSON.stringify(defaultData));
@@ -289,129 +301,178 @@
             });
         }
 
-        // --- Render UI ---
-        function renderAll() {
-            // Text Inputs
-            document.getElementById('about-title').value = currentData.aboutTitle || '';
-            document.getElementById('about-text').value = currentData.aboutText || '';
-            document.getElementById('about-img').value = currentData.aboutImageUrl || '';
-            updatePreview('about-preview', currentData.aboutImageUrl);
+        // --- IMAGE UPLOAD LOGIC ---
+        function triggerUpload(id) { document.getElementById(id).click(); }
 
-            document.getElementById('services-title').value = currentData.servicesTitle || 'Our Services';
-            document.getElementById('services-subtitle').value = currentData.servicesSubtitle || 'Our Grateful Events & Services';
+        async function uploadImage(fileInputId, urlInputId, previewId) {
+            const fileInput = document.getElementById(fileInputId);
+            const urlInput = document.getElementById(urlInputId);
+            const file = fileInput.files[0];
+            
+            // UI References for Loading State
+            const wrapper = fileInput.parentElement;
+            const contentDiv = wrapper.querySelector('div'); // The inner content with icon
+            const originalContent = contentDiv.innerHTML;
+
+            if (!file) return;
+
+            // Set Loading State
+            wrapper.classList.add('uploading');
+            contentDiv.innerHTML = '<div class="spinner"></div><p class="font-bold text-blue-500 mt-2">Uploading...</p>';
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            try {
+                if(IMGBB_API_KEY.includes("PASTE")) throw new Error("Please add your ImgBB API Key in code line 480");
+
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    const url = data.data.url;
+                    urlInput.value = url;
+                    urlInput.dispatchEvent(new Event('input')); // Trigger any listeners
+                    
+                    if(previewId) updatePreview(previewId, url);
+                    
+                    // Special Handling for Dynamic Lists
+                    if(urlInputId.includes('service-url-')) {
+                        const idx = urlInputId.split('-').pop();
+                        currentData.services[idx].imageUrl = url;
+                    }
+                    if(urlInputId.includes('gallery-url-')) {
+                        const idx = urlInputId.split('-').pop();
+                        currentData.galleryImages[idx] = url;
+                    }
+
+                    // AUTO SAVE!
+                    saveChanges(); 
+
+                } else {
+                    alert("Upload Error: " + (data.error?.message || "Unknown"));
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Upload Failed: " + error.message);
+            } finally {
+                // Reset UI
+                wrapper.classList.remove('uploading');
+                contentDiv.innerHTML = originalContent;
+                fileInput.value = ''; // clear selection
+            }
+        }
+
+        // --- RENDER UI ---
+        function renderAll() {
+            // Bind standard fields
+            const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
+            const setPreview = (id, val) => updatePreview(id, val);
+
+            setVal('about-title', currentData.aboutTitle);
+            setVal('about-text', currentData.aboutText);
+            setVal('about-img', currentData.aboutImageUrl);
+            setPreview('about-preview', currentData.aboutImageUrl);
+            
+            setVal('hero-img', currentData.heroImageUrl);
+            setPreview('hero-preview', currentData.heroImageUrl);
+
+            setVal('services-title', currentData.servicesTitle || 'Our Services');
+            setVal('services-subtitle', currentData.servicesSubtitle || 'Our Grateful Events');
 
             if(!currentData.socialLinks) currentData.socialLinks = {};
-            document.getElementById('social-instagram').value = currentData.socialLinks.instagram || '';
-            document.getElementById('social-facebook').value = currentData.socialLinks.facebook || '';
-            document.getElementById('social-linkedin').value = currentData.socialLinks.linkedin || '';
+            setVal('social-instagram', currentData.socialLinks.instagram);
+            setVal('social-facebook', currentData.socialLinks.facebook);
+            setVal('social-linkedin', currentData.socialLinks.linkedin);
 
-            // Lists
+            // Services
             renderList('services', 'list-services', (item, i) => `
-                <div class="bg-white p-4 rounded shadow border relative">
-                    <button onclick="deleteListItem('services', ${i})" class="absolute top-2 right-2 text-red-500 font-bold">✕</button>
-                    <div class="mb-2"><label class="text-xs font-bold text-gray-500">Service Title</label><input class="w-full border rounded p-1" value="${item.title}" oninput="updateDeepItem('services', ${i}, 'title', this.value)"></div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 relative">
+                    <button onclick="deleteListItem('services', ${i})" class="absolute top-3 right-3 text-red-400 hover:text-red-600 bg-red-50 p-2 rounded-full"><i class="fas fa-trash"></i></button>
+                    <div class="mb-4">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Title</label>
+                        <input class="w-full border-b border-slate-200 font-bold text-slate-700 py-1 outline-none focus:border-blue-500" value="${item.title}" oninput="updateDeepItem('services', ${i}, 'title', this.value)">
+                    </div>
                     <div>
-                        <label class="text-xs font-bold text-gray-500">Image Link (URL)</label>
-                        <input class="w-full border rounded p-1 mb-2" value="${item.imageUrl}" oninput="updateDeepItemAndPreview('services', ${i}, 'imageUrl', this.value, 'svc-preview-${i}')">
-                        <img id="svc-preview-${i}" src="${item.imageUrl}" class="h-24 w-full object-cover rounded bg-gray-100">
+                        <div class="upload-zone border-2 border-dashed border-slate-300 rounded-lg p-4 text-center cursor-pointer group mb-2" onclick="triggerUpload('service-file-${i}')">
+                            <input type="file" id="service-file-${i}" class="hidden" onchange="uploadImage('service-file-${i}', 'service-url-${i}', 'svc-preview-${i}')">
+                            <div><i class="fas fa-cloud-upload-alt text-2xl text-slate-300 group-hover:text-blue-500"></i><span class="text-sm font-bold text-slate-500 ml-2 group-hover:text-blue-600">Upload</span></div>
+                        </div>
+                        <input class="w-full text-xs text-slate-400 border rounded p-1 mb-2" id="service-url-${i}" value="${item.imageUrl}" oninput="updateDeepItemAndPreview('services', ${i}, 'imageUrl', this.value, 'svc-preview-${i}')">
+                        <img id="svc-preview-${i}" src="${item.imageUrl}" class="h-32 w-full object-cover rounded-lg bg-slate-100">
                     </div>
                 </div>
             `);
 
+            // Gallery
             renderList('galleryImages', 'list-galleryImages', (url, i) => `
-                <div class="flex gap-2 items-center">
-                    <img id="gal-preview-${i}" src="${url}" class="h-12 w-12 object-cover rounded border">
-                    <input class="flex-1 border p-2 rounded" value="${url}" oninput="updateSimpleItemAndPreview('galleryImages', ${i}, this.value, 'gal-preview-${i}')">
-                    <button onclick="deleteListItem('galleryImages', ${i})" class="text-red-500 px-2"><i class="fas fa-trash"></i></button>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="upload-zone border-2 border-dashed border-slate-300 rounded-lg h-32 flex items-center justify-center cursor-pointer group mb-3 relative overflow-hidden" onclick="triggerUpload('gallery-file-${i}')">
+                        <input type="file" id="gallery-file-${i}" class="hidden" onchange="uploadImage('gallery-file-${i}', 'gallery-url-${i}', 'gal-preview-${i}')">
+                        <img id="gal-preview-${i}" src="${url}" class="absolute inset-0 w-full h-full object-cover z-0">
+                        <div class="absolute inset-0 bg-white/80 z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-cloud-upload-alt text-2xl text-blue-500"></i>
+                            <span class="text-xs font-bold text-blue-600">Change Image</span>
+                        </div>
+                        <div class="z-0 ${url ? 'hidden' : 'flex'} flex-col items-center"><i class="fas fa-image text-slate-300 text-3xl"></i></div>
+                    </div>
+                    <input class="w-full text-xs border rounded p-1 mb-2" id="gallery-url-${i}" value="${url}" oninput="updateSimpleItemAndPreview('galleryImages', ${i}, this.value, 'gal-preview-${i}')">
+                    <button onclick="deleteListItem('galleryImages', ${i})" class="w-full bg-red-50 text-red-500 text-xs py-1 rounded hover:bg-red-100">Remove</button>
                 </div>
             `);
 
-            // Other lists (Simple)
-            ['serviceCategories', 'facilities', 'keyServices'].forEach(key => {
-                const div = document.getElementById('list-'+key);
-                div.innerHTML = '';
+            // Simple Lists
+            ['serviceCategories', 'facilities', 'keyServices', 'testimonials'].forEach(key => {
+                const el = document.getElementById('list-'+key);
+                el.innerHTML = '';
                 (currentData[key]||[]).forEach((item, i) => {
-                    div.innerHTML += `<div class="flex items-center bg-white p-3 rounded shadow-sm border"><input class="flex-1 bg-transparent outline-none" value="${item}" onchange="updateListItem('${key}', ${i}, this.value)"><button onclick="deleteListItem('${key}', ${i})" class="text-red-500 ml-2">✕</button></div>`;
+                    if(key === 'testimonials') {
+                        el.innerHTML += `<div class="bg-white p-4 rounded shadow border mb-2"><button onclick="deleteListItem('${key}', ${i})" class="float-right text-red-400">✕</button><input class="w-full font-bold mb-1 border-b" value="${item.name}" onchange="updateDeepItem('${key}', ${i}, 'name', this.value)"><input class="w-full text-xs text-blue-500 mb-1" value="${item.event}" onchange="updateDeepItem('${key}', ${i}, 'event', this.value)"><textarea class="w-full text-sm text-gray-600 bg-gray-50 p-2 rounded" onchange="updateDeepItem('${key}', ${i}, 'quote', this.value)">${item.quote}</textarea></div>`;
+                    } else {
+                        el.innerHTML += `<div class="flex items-center bg-white p-3 rounded shadow-sm border mb-2"><input class="flex-1 bg-transparent outline-none" value="${item}" onchange="updateListItem('${key}', ${i}, this.value)"><button onclick="deleteListItem('${key}', ${i})" class="text-red-400 ml-2">✕</button></div>`;
+                    }
                 });
             });
-
-            // Testimonials
-            const tDiv = document.getElementById('list-testimonials');
-            tDiv.innerHTML = '';
-            (currentData.testimonials||[]).forEach((t, i) => {
-                tDiv.innerHTML += `<div class="bg-white p-4 rounded shadow relative"><button onclick="deleteListItem('testimonials', ${i})" class="absolute top-2 right-2 text-red-500">✕</button><input class="w-full border p-1 mb-2" value="${t.name}" onchange="updateDeepItem('testimonials', ${i}, 'name', this.value)"><input class="w-full border p-1 mb-2" value="${t.event}" onchange="updateDeepItem('testimonials', ${i}, 'event', this.value)"><textarea class="w-full border p-1" onchange="updateDeepItem('testimonials', ${i}, 'quote', this.value)">${t.quote}</textarea></div>`;
-            });
         }
 
-        // --- Helpers ---
-        function renderList(key, id, tpl) {
-            const el = document.getElementById(id);
-            el.innerHTML = '';
-            (currentData[key]||[]).forEach((item, i) => el.innerHTML += tpl(item, i));
-        }
-        function updatePreview(id, src) {
-            const el = document.getElementById(id);
-            if(el) { el.src = src; el.classList.remove('hidden'); }
-        }
+        // --- LOGIC HELPERS ---
+        function updatePreview(id, src) { const el = document.getElementById(id); if(el) { el.src = src; el.classList.remove('hidden'); } }
         function updateDeepItem(k, i, f, v) { currentData[k][i][f] = v; }
         function updateListItem(k, i, v) { currentData[k][i] = v; }
+        function updateDeepItemAndPreview(k, i, f, v, pid) { currentData[k][i][f] = v; updatePreview(pid, v); }
+        function updateSimpleItemAndPreview(k, i, v, pid) { currentData[k][i] = v; updatePreview(pid, v); }
+        function renderList(k, id, fn) { document.getElementById(id).innerHTML = (currentData[k]||[]).map(fn).join(''); }
         
-        // Special preview updaters for list items
-        function updateDeepItemAndPreview(k, i, f, v, imgId) {
-            currentData[k][i][f] = v;
-            updatePreview(imgId, v);
-        }
-        function updateSimpleItemAndPreview(k, i, v, imgId) {
-            currentData[k][i] = v;
-            updatePreview(imgId, v);
-        }
-
-        function deleteListItem(k, i) {
-            if(confirm('Delete?')) { currentData[k].splice(i, 1); renderAll(); }
-        }
-        function addItem(k) {
-            if(!currentData[k]) currentData[k]=[];
-            if(k==='services') currentData[k].push({title:'New', imageUrl:'https://via.placeholder.com/300'});
-            renderAll();
-        }
-        function addSimpleItem(k) {
-            if(!currentData[k]) currentData[k]=[];
-            currentData[k].push(k==='galleryImages'?'https://via.placeholder.com/150':'New Item');
-            renderAll();
-        }
-        function addTestimonial() {
-            if(!currentData.testimonials) currentData.testimonials=[];
-            currentData.testimonials.push({name:'Name',event:'Event',quote:'Quote'});
-            renderAll();
-        }
+        function deleteListItem(k, i) { if(confirm('Delete?')) { currentData[k].splice(i, 1); renderAll(); saveChanges(); } }
+        function addItem(k) { if(!currentData[k]) currentData[k]=[]; currentData[k].push({title:'New', imageUrl:''}); renderAll(); }
+        function addSimpleItem(k) { if(!currentData[k]) currentData[k]=[]; currentData[k].push(k==='galleryImages'?'': 'New Item'); renderAll(); }
+        function addTestimonial() { if(!currentData.testimonials) currentData.testimonials=[]; currentData.testimonials.push({name:'Name',event:'Event',quote:'Text'}); renderAll(); }
 
         function saveChanges() {
+            // Sync singular inputs
             currentData.aboutTitle = document.getElementById('about-title').value;
             currentData.aboutText = document.getElementById('about-text').value;
             currentData.aboutImageUrl = document.getElementById('about-img').value;
+            currentData.heroImageUrl = document.getElementById('hero-img').value;
             currentData.servicesTitle = document.getElementById('services-title').value;
             currentData.servicesSubtitle = document.getElementById('services-subtitle').value;
-            
             if(!currentData.socialLinks) currentData.socialLinks={};
             currentData.socialLinks.instagram = document.getElementById('social-instagram').value;
             currentData.socialLinks.facebook = document.getElementById('social-facebook').value;
             currentData.socialLinks.linkedin = document.getElementById('social-linkedin').value;
 
             const btn = document.getElementById('save-btn');
-            btn.innerHTML = 'Saving...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
             db.ref('websiteData').set(currentData).then(() => {
-                btn.innerHTML = 'Publish Changes';
-                document.getElementById('toast').classList.remove('translate-y-24');
-                setTimeout(()=>document.getElementById('toast').classList.add('translate-y-24'), 3000);
+                btn.innerHTML = '<i class="fas fa-save"></i> Publish Changes';
+                const toast = document.getElementById('toast');
+                toast.classList.remove('translate-y-40');
+                setTimeout(() => toast.classList.add('translate-y-40'), 3000);
             });
-        }
-
-        function restoreDefaultData() {
-            if(confirm("Reset all data?")) {
-                currentData = JSON.parse(JSON.stringify(defaultData));
-                renderAll();
-                saveChanges();
-            }
         }
 
         function switchTab(id) {
